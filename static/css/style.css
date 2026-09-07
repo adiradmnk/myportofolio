@@ -36,12 +36,14 @@ h1, .brand {
 }
 
 .site-header {
-    position: absolute;
+    position: fixed;
     width: 100%;
     top: 0;
     z-index: 100;
-    background-color: transparent;
-    border: none;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    background-color: rgba(6, 21, 42, 0.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .site-header .container {
