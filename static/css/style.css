@@ -75,9 +75,12 @@ h1, .brand {
 .hero {
     position: relative;
     padding: 10rem 0 8rem;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
     background-image: linear-gradient(to bottom, transparent 40%, var(--paper) 100%), url('../img/oceon.jpg');
     background-size: cover;
-    background-position: center bottom;
+    background-position: center center;
 }
 
 
