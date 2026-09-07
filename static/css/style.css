@@ -116,7 +116,7 @@ h1, .brand {
 }
 .skills, .projects {
     padding: 4rem 0;
-    border-top: 1px solid var(--line);
+    
 }
 
 .section-title {
@@ -125,26 +125,61 @@ h1, .brand {
     margin-bottom: 2rem;
 }
 
-.skills-list {
+.marquee-container {
+    width: 100%;
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    padding: 2rem 0;
+}
+
+.marquee-content {
     display: flex;
-    flex-wrap: wrap;
+    gap: 4rem;
+    width: max-content;
+    animation: scroll 15s linear infinite;
+}
+
+.marquee-content:hover {
+    animation-play-state: paused;
+}
+
+@keyframes scroll {
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.tech-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 1rem;
+    opacity: 0.6;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
 }
 
-.skill-item {
-    background-color: var(--line);
-    color: var(--ink);
-    padding: 0.75rem 1.25rem;
-    border-radius: var(--radius);
-    font-weight: 600;
+.tech-icon:hover {
+    opacity: 1;
+    transform: translateY(-5px);
+}
+
+.tech-icon img, .tech-icon svg {
+    width: 55px;
+    height: 55px;
+    filter: grayscale(100%) brightness(200%);
+    transition: filter 0.3s ease;
+}
+
+.tech-icon:hover img, .tech-icon:hover svg {
+    filter: grayscale(0%) brightness(100%);
+}
+
+.tech-icon p {
     font-size: 0.9rem;
-    transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.skill-item:hover {
-    background-color: var(--accent);
-    color: var(--paper);
-    transform: translateY(-3px);
+    font-weight: 600;
+    letter-spacing: 0.05em;
 }
 
 .projects-grid {
@@ -183,7 +218,7 @@ h1, .brand {
     padding: 1.5rem;
     color: var(--text-muted);
     font-size: 0.85rem;
-    border-top: 1px solid var(--line);
+    
 }
 
 @media (max-width: 600px) {
