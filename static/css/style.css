@@ -19,14 +19,14 @@ html {
 }
 
 body {
-    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: "Times New Roman", Times, serif;
     color: var(--ink);
     background-color: var(--paper);
     line-height: 1.6;
 }
 
 h1, .brand {
-    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-family: "Times New Roman", Times, serif;
 }
 
 .container {
@@ -36,14 +36,12 @@ h1, .brand {
 }
 
 .site-header {
-    position: fixed;
+    position: absolute;
     width: 100%;
     top: 0;
     z-index: 100;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    background-color: rgba(6, 21, 42, 0.5);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background-color: transparent;
+    border: none;
 }
 
 .site-header .container {
@@ -82,118 +80,44 @@ h1, .brand {
     background-position: center bottom;
 }
 
-.hero-grid {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    grid-template-areas:
-        "identity photo"
-        "details  photo";
-    gap: 1.5rem 3rem;
+
+.hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 40vh;
 }
 
-.hero-identity {
-    grid-area: identity;
-}
-
-.hero-details {
-    grid-area: details;
-}
-
-.hero-kicker {
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--accent-dark);
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-}
-
-.hero-identity h1 {
+.hero-content h1 {
     font-size: clamp(3rem, 7vw, 5rem);
-    line-height: 0.95;
+    line-height: 1.1;
+    margin-bottom: 1rem;
 }
 
-.bio {
-    color: var(--text-muted);
-    max-width: 480px;
-    margin-bottom: 1.5rem;
-}
-
-.meta-list {
+.social-logos {
     display: flex;
-    gap: 2rem;
-    margin-bottom: 1.5rem;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
 }
 
-.meta-row dt {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-muted);
-    margin-bottom: 0.15rem;
+.logo-link {
+    color: var(--ink);
+    transition: transform 0.2s ease, color 0.2s ease;
 }
 
-.meta-row dd {
-    font-weight: 600;
+.logo-link:hover {
+    transform: scale(1.1);
+    color: var(--accent);
 }
-
-.social-links {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.social-link {
-    display: inline-block;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-decoration: none;
-    color: var(--paper);
-    background-color: var(--ink);
-    border-radius: var(--radius);
-    padding: 0.5rem 1.1rem;
-    transition: background-color 0.2s ease;
-}
-
-.social-link:hover {
-    background-color: var(--accent);
-}
-
-.hero-photo {
-    grid-area: photo;
-    align-self: center;
-    position: relative;
-}
-
-.photo-block {
-    position: absolute;
-    top: 1.25rem;
-    left: 1.25rem;
-    width: 100%;
-    height: 100%;
-    background-color: var(--accent);
-    border-radius: var(--radius);
-    z-index: 0;
-}
-
-.avatar {
-    position: relative;
-    z-index: 1;
-    display: block;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: var(--radius);
-    border: 3px solid var(--ink);
-}
-
 .skills, .projects {
     padding: 4rem 0;
     border-top: 1px solid var(--line);
 }
 
 .section-title {
-    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-family: "Times New Roman", Times, serif;
     font-size: 2rem;
     margin-bottom: 2rem;
 }
@@ -242,7 +166,7 @@ h1, .brand {
 }
 
 .project-card h3 {
-    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-family: "Times New Roman", Times, serif;
     margin-bottom: 0.75rem;
     font-size: 1.25rem;
 }
