@@ -9,12 +9,12 @@ html {
 }
 
 :root {
-    --ink: #1c1917;
-    --paper: #faf6f0;
-    --accent: #d95d39;
-    --accent-dark: #a8442a;
-    --line: #e3d9c9;
-    --text-muted: #6b6459;
+    --ink: #f8fafc;
+    --paper: #06152a;
+    --accent: #3b82f6;
+    --accent-dark: #60a5fa;
+    --line: #1e293b;
+    --text-muted: #94a3b8;
     --radius: 4px;
 }
 
@@ -36,6 +36,12 @@ h1, .brand {
 }
 
 .site-header {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+    background-color: rgba(6, 21, 42, 0.4);
     border-bottom: 1px solid var(--line);
 }
 
@@ -65,7 +71,11 @@ h1, .brand {
 }
 
 .hero {
-    padding: 4.5rem 0 5rem;
+    position: relative;
+    padding: 10rem 0 8rem;
+    background-image: linear-gradient(to bottom, transparent 40%, var(--paper) 100%), url('../img/oceon.jpg');
+    background-size: cover;
+    background-position: center bottom;
 }
 
 .hero-grid {
@@ -213,16 +223,18 @@ h1, .brand {
 }
 
 .project-card {
-    background-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     padding: 1.5rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    backdrop-filter: blur(10px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .project-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
 .project-card h3 {
