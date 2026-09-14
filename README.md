@@ -25,7 +25,7 @@ Repositori ini merupakan karya pribadi untuk keperluan tugas mata kuliah wajib y
    ```
 5. Buka `http://localhost:8000/` di browser Anda. (untuk melihat hasil kode di browser)
 
-jika anda hanya inign melihat hasil protofolio atau hasil compile dari kode yang sudah say abuat anda bisa membuka di https://
+jika anda hanya inign melihat hasil protofolio atau hasil compile dari kode yang sudah say abuat anda bisa membuka di [https://](https://adriana-ainurrahmah-myportofolio.pws.cs.ui.ac.id/)
 
 ---
 ## Tugas 1
