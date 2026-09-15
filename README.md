@@ -41,3 +41,17 @@ Batasan utama dari static web murni adalah semua informasi harus dihardcode lang
 
 ### AI Disclosure
 Walaupun saya mengetik secara menual untuk setiap baris kode, saya tetap menggunakan ai untuk memandu saya dalam proses pembuatan setiap komponen dan cara penyusunan kode yang rapih dan bekerja dengan baik. Disini saya menggunakan ai pertama untuk brainstorming ide bagaimana layout dan isi ide desain dari portofolio yang akan saya buat, setelah konsep dari desian dan isi sudah saya tentukan, maka selanjutnya saya meminta ai untuk menjelaskan kepada saya bertahap bagaimana mewujudkan setiap bagian dari konsep yang sudah saya tentukan sebelumnya, untuk komponen komponen yang ada pada web saya, saya tidak membuatnya dnegan ai tapi saya mengambilnya dari open source library atau dari web open source.
+
+---
+## Tugas 2
+
+**1. Alur Request pada MVT Django**
+Ketika pengguna membuka halaman `/projects/`, permintaan pertama kali diterima oleh `portofolio/urls.py` (proyek) yang kemudian meneruskannya ke `main/urls.py` (aplikasi). Di sana, URL dicocokkan dengan rute yang memanggil fungsi view `show_projects`. View ini lalu berkomunikasi dengan model `Project` untuk mengambil seluruh data proyek dari database (`Project.objects.all()`). Setelah mendapatkan data, view akan memasukkannya ke dalam sebuah variabel *context* dan meneruskannya ke template `projects.html`. Template kemudian memproses data dinamis tersebut (menggunakan perulangan `{% for %}`) menjadi halaman HTML statis utuh yang akhirnya dikirim kembali ke browser pengguna.
+
+**2. Keuntungan Menyimpan Data di Model**
+Menyimpan data di model (database) memisahkan logika tampilan dari logika data. Dampak positifnya sangat besar terhadap pemeliharaan aplikasi: jika saya ingin menambahkan proyek baru atau mengedit deskripsi, saya tidak perlu lagi membongkar dan mengedit file HTML (yang rawan merusak tata letak kode). Saya cukup memperbarui data di database dan template akan secara otomatis menampilkan versi terbarunya, membuat skalabilitas aplikasi jauh lebih baik.
+
+**3. Perbedaan makemigrations dan migrate**
+- `makemigrations` bertugas melacak setiap perubahan struktur yang kita lakukan pada class Model di Python dan merumuskannya menjadi sebuah file skema instruksi (file migrasi).
+- `migrate` bertugas mengeksekusi instruksi dari file migrasi tersebut secara langsung ke dalam sistem database (menjalankan perintah SQL di balik layar).
+Contoh: Jika saya menambahkan atribut baru `link = models.URLField()` di dalam model `Project`, saya harus menjalankan `makemigrations` agar Django tahu ada kolom baru yang ingin ditambahkan, lalu dilanjutkan dengan `migrate` agar kolom `link` tersebut benar-benar ditambahkan ke tabel pada file `db.sqlite3`.

@@ -49,3 +49,22 @@ class MainTest(TestCase):
         self.assertFalse(self.experience.is_ongoing)
         self.assertContains(response, "Selesai")
         self.assertNotContains(response, "Sedang berlangsung")
+
+    def test_projects_url_is_accessible(self):
+        response = self.client.get(reverse("main:show_projects"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "projects.html")
+
+    def test_projects_page_with_data(self):
+        from main.models import Project
+        p = Project.objects.create(title="BEFU", role="Project Leader", description="Aplikasi keren")
+        response = self.client.get(reverse("main:show_projects"))
+        self.assertContains(response, "BEFU")
+        self.assertContains(response, "Project Leader")
+        self.assertContains(response, "Aplikasi keren")
+
+    def test_empty_projects_page(self):
+        from main.models import Project
+        Project.objects.all().delete()
+        response = self.client.get(reverse("main:show_projects"))
+        self.assertContains(response, "Belum ada proyek yang ditambahkan.")

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - {{ name }}</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=10">
+</head>
+<body>
+    <header class="site-header">
+        <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
+        <nav>
+            <a href="{% url 'main:show_main' %}">Profile</a>
+            <a href="{% url 'main:show_experience' %}">Experience</a>
+            <a href="{% url 'main:show_projects' %}">Projects</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="projects" id="projects">
+            <div class="container">
+                <h2 class="section-title" style="text-align: center;">Recent Projects</h2>
+                <div class="timeline">
+                    {% for project in project_list %}
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <h3>{{ project.title }}</h3>
+                            <p class="role">{{ project.role }}</p>
+                            <p>{{ project.description }}</p>
+                            {% if project.link %}
+                            <a href="{{ project.link }}" target="_blank" style="color: var(--accent); font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">Lihat Proyek &rarr;</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p style="text-align: center; color: var(--text-muted);">Belum ada proyek yang ditambahkan.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+        </div>
+    </footer>
+</body>
+</html>
