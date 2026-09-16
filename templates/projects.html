@@ -1,50 +1,53 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects - {{ name }}</title>
-    <link rel="stylesheet" href="/static/css/style.css?v=10">
-</head>
-<body>
-    <header class="site-header">
-        <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
-        <nav>
-            <a href="{% url 'main:show_main' %}">Profile</a>
-            <a href="{% url 'main:show_experience' %}">Experience</a>
-            <a href="{% url 'main:show_projects' %}">Projects</a>
-        </nav>
-    </header>
+{% extends "base.html" %}
 
-    <main>
-        <section class="projects" id="projects">
-            <div class="container">
-                <h2 class="section-title" style="text-align: center;">Recent Projects</h2>
-                <div class="timeline">
-                    {% for project in project_list %}
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-content">
-                            <h3>{{ project.title }}</h3>
-                            <p class="role">{{ project.role }}</p>
-                            <p>{{ project.description }}</p>
-                            {% if project.link %}
-                            <a href="{{ project.link }}" target="_blank" style="color: var(--accent); font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">Lihat Proyek &rarr;</a>
-                            {% endif %}
+{% block meta %}
+<title>Projects - {{ name }}</title>
+{% endblock meta %}
+
+{% block content %}
+<main>
+    <section class="experience-section" id="projects">
+        <div class="container">
+            <p class="section-kicker">Karya yang saya bangun</p>
+            <div class="project-header">
+                <h1>Projects</h1>
+                <a href="{% url 'main:create_project' %}" class="button project-add-button">
+                    <span aria-hidden="true">+</span> Tambah Proyek
+                </a>
+            </div>
+
+            <form method="get" action="{% url 'main:show_projects' %}" class="project-search">
+                <input type="search" name="title" value="{{ title_query }}" placeholder="Cari berdasarkan nama proyek" class="project-search__input" aria-label="Cari berdasarkan nama proyek">
+                <button type="submit" class="button">Cari</button>
+            </form>
+
+            <div class="timeline">
+                {% for project in project_list %}
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>{{ project.title }}</h3>
+                        <p class="role">{{ project.role }}</p>
+                        <p>{{ project.description }}</p>
+                        <div class="project-card-actions">
+                            <div class="project-actions">
+                                {% if project.link %}
+                                <a href="{{ project.link }}" target="_blank" class="button">Lihat Proyek &rarr;</a>
+                                {% endif %}
+                                {% include "components/project_delete_modal.html" with project=project %}
+                            </div>
                         </div>
                     </div>
-                    {% empty %}
-                    <p style="text-align: center; color: var(--text-muted);">Belum ada proyek yang ditambahkan.</p>
-                    {% endfor %}
                 </div>
+                {% empty %}
+                {% if title_query %}
+                <p class="empty-state" style="text-align: center;">Tidak ada proyek dengan nama tersebut.</p>
+                {% else %}
+                <p class="empty-state" style="text-align: center;">Belum ada proyek yang ditambahkan.</p>
+                {% endif %}
+                {% endfor %}
             </div>
-        </section>
-    </main>
-
-    <footer class="site-footer">
-        <div class="container">
-            <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
         </div>
-    </footer>
-</body>
-</html>
+    </section>
+</main>
+{% endblock content %}

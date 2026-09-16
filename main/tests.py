@@ -68,3 +68,42 @@ class MainTest(TestCase):
         Project.objects.all().delete()
         response = self.client.get(reverse("main:show_projects"))
         self.assertContains(response, "Belum ada proyek yang ditambahkan.")
+
+    def test_create_project_view(self):
+        from main.models import Project
+        response = self.client.get(reverse("main:create_project"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "projects_form.html")
+
+        post_data = {
+            "title": "Proyek Uji Coba",
+            "role": "Developer",
+            "description": "Deskripsi uji coba",
+            "link": "https://github.com/example",
+        }
+        post_response = self.client.post(reverse("main:create_project"), post_data)
+        self.assertEqual(post_response.status_code, 302)
+        self.assertTrue(Project.objects.filter(title="Proyek Uji Coba").exists())
+
+    def test_delete_project_view(self):
+        from main.models import Project
+        p = Project.objects.create(title="Proyek Hapus", role="Tester", description="Akan dihapus")
+        delete_response = self.client.post(reverse("main:delete_project", kwargs={"project_id": p.id}))
+        self.assertEqual(delete_response.status_code, 302)
+        self.assertFalse(Project.objects.filter(id=p.id).exists())
+
+    def test_get_projects_json(self):
+        from main.models import Project
+        Project.objects.create(title="Proyek JSON", role="Dev", description="Desc JSON")
+        response = self.client.get(reverse("main:get_projects_json"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/json")
+        self.assertIn("Proyek JSON", response.content.decode("utf-8"))
+
+    def test_get_projects_xml(self):
+        from main.models import Project
+        Project.objects.create(title="Proyek XML", role="Dev", description="Desc XML")
+        response = self.client.get(reverse("main:get_projects_xml"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/xml")
+        self.assertIn("Proyek XML", response.content.decode("utf-8"))
