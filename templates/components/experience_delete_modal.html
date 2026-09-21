@@ -1,22 +1,19 @@
-<p class="experience-status">
-    <button type="button" class="button button-danger" popovertarget="delete-experience-{{ experience.id }}" aria-label="Hapus {{ experience.title }}" title="Hapus pengalaman">
-        Hapus
-    </button>
-</p>
+<button type="button" class="btn-action-delete" popovertarget="delete-experience-{{ experience.id }}" aria-label="Hapus {{ experience.title }}" title="Hapus pengalaman">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+    Hapus
+</button>
 
 <div id="delete-experience-{{ experience.id }}" class="project-delete-modal" popover="auto" role="dialog" aria-modal="true" aria-labelledby="delete-exp-title-{{ experience.id }}">
     <button type="button" class="project-delete-modal__backdrop" popovertarget="delete-experience-{{ experience.id }}" popovertargetaction="hide" aria-label="Tutup konfirmasi hapus"></button>
     <div class="project-delete-modal__content">
         <button type="button" class="project-delete-modal__close" popovertarget="delete-experience-{{ experience.id }}" popovertargetaction="hide" aria-label="Tutup konfirmasi hapus">×</button>
         <h2 id="delete-exp-title-{{ experience.id }}">Hapus Pengalaman?</h2>
-        <p>
-            Apakah Anda yakin ingin menghapus <strong>{{ experience.title }}</strong>?
-        </p>
+        <p>Apakah Anda yakin ingin menghapus pengalaman <strong>{{ experience.title }}</strong>?</p>
         <div class="project-delete-modal__actions">
-            <button type="button" class="button button-secondary" popovertarget="delete-experience-{{ experience.id }}" popovertargetaction="hide">Batal</button>
+            <button type="button" class="btn-modal-cancel" popovertarget="delete-experience-{{ experience.id }}" popovertargetaction="hide">Batal</button>
             <form method="post" action="{% url 'main:delete_experience' experience.id %}">
                 {% csrf_token %}
-                <button type="submit" class="button button-danger">Ya, Hapus</button>
+                <button type="submit" class="btn-modal-delete">Ya, Hapus</button>
             </form>
         </div>
     </div>

@@ -5,45 +5,47 @@
 {% endblock meta %}
 
 {% block content %}
-<main>
-    <section class="experience-section" id="experience">
+<main class="page-main">
+    <section class="page-section" id="experience">
         <div class="container">
-            <p class="section-kicker">Perjalanan saya sejauh ini</p>
-            <div class="project-header">
-                <h1>Experience</h1>
-                <a href="{% url 'main:create_experience' %}" class="button project-add-button">
-                    <span aria-hidden="true">+</span> Tambah Pengalaman
+            <div class="section-header-row">
+                <div>
+                    <h1 class="page-title">Experience</h1>
+                    <p class="section-subtitle">Perjalanan profesional dan rekam jejak kepemimpinan.</p>
+                </div>
+                <a href="{% url 'main:create_experience' %}" class="btn-primary-action">
+                    + Tambah Pengalaman
                 </a>
             </div>
             
-            <div class="experience-grid">
+            <div class="experience-timeline-modern">
                 {% for experience in experience_list %}
-                    <article class="experience-card">
-                        <span class="experience-category">
-                            {{ experience.get_category_display }}
-                        </span>
-                        <h2>{{ experience.title }}</h2>
-                        <p class="experience-description">
-                            {{ experience.description }}
-                        </p>
-                        
-                        {% if experience.is_ongoing %}
-                            <p class="experience-status">Sedang berlangsung</p>
-                        {% else %}
-                            <p class="experience-status">Selesai</p>
-                        {% endif %}
+                <article class="experience-showcase-card">
+                    <span class="sr-only">{{ experience.get_category_display }}</span>
+                    {% if experience.is_ongoing %}
+                    <span class="sr-only">Sedang berlangsung</span>
+                    {% else %}
+                    <span class="sr-only">Selesai</span>
+                    {% endif %}
 
-                        <div class="project-card-actions">
-                            <div class="project-actions">
-                                <a href="{% url 'main:edit_experience' experience.id %}" class="button button-secondary">Edit</a>
-                                {% include "components/experience_delete_modal.html" with experience=experience %}
-                            </div>
+                    <h2 class="exp-title">{{ experience.title }}</h2>
+                    <p class="exp-desc">{{ experience.description }}</p>
+
+                    <div class="exp-card-footer">
+                        <div class="project-manage-actions">
+                            <a href="{% url 'main:edit_experience' experience.id %}" class="btn-action-edit">
+                                Edit
+                            </a>
+                            {% include "components/experience_delete_modal.html" with experience=experience %}
                         </div>
-                    </article>
+                    </div>
+                </article>
                 {% empty %}
-                    <p class="empty-state">
-                        Belum ada pengalaman yang ditambahkan.
-                    </p>
+                <div class="empty-state-card">
+                    <h3>Belum ada pengalaman</h3>
+                    <p class="empty-state">Belum ada pengalaman yang ditambahkan.</p>
+                    <a href="{% url 'main:create_experience' %}" class="btn-primary-action">+ Tambah Pengalaman</a>
+                </div>
                 {% endfor %}
             </div>
         </div>

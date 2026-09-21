@@ -1,22 +1,19 @@
-<p class="experience-status">
-    <button type="button" class="button button-danger" popovertarget="delete-project-{{ project.id }}" aria-label="Hapus {{ project.title }}" title="Hapus proyek">
-        Hapus Proyek
-    </button>
-</p>
+<button type="button" class="btn-action-delete" popovertarget="delete-project-{{ project.id }}" aria-label="Hapus {{ project.title }}" title="Hapus proyek">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+    Hapus
+</button>
 
 <div id="delete-project-{{ project.id }}" class="project-delete-modal" popover="auto" role="dialog" aria-modal="true" aria-labelledby="delete-project-title-{{ project.id }}">
     <button type="button" class="project-delete-modal__backdrop" popovertarget="delete-project-{{ project.id }}" popovertargetaction="hide" aria-label="Tutup konfirmasi hapus"></button>
     <div class="project-delete-modal__content">
         <button type="button" class="project-delete-modal__close" popovertarget="delete-project-{{ project.id }}" popovertargetaction="hide" aria-label="Tutup konfirmasi hapus">×</button>
-        <h2 id="delete-project-title-{{ project.id }}">Hapus Projek?</h2>
-        <p>
-            Apakah Anda yakin ingin menghapus <strong>{{ project.title }}</strong>?
-        </p>
+        <h2 id="delete-project-title-{{ project.id }}">Hapus Proyek?</h2>
+        <p>Apakah Anda yakin ingin menghapus proyek <strong>{{ project.title }}</strong>? Tindakan ini tidak dapat dibatalkan.</p>
         <div class="project-delete-modal__actions">
-            <button type="button" class="button button-secondary" popovertarget="delete-project-{{ project.id }}" popovertargetaction="hide">Batal</button>
+            <button type="button" class="btn-modal-cancel" popovertarget="delete-project-{{ project.id }}" popovertargetaction="hide">Batal</button>
             <form method="post" action="{% url 'main:delete_project' project.id %}">
                 {% csrf_token %}
-                <button type="submit" class="button button-danger">Ya, Hapus</button>
+                <button type="submit" class="btn-modal-delete">Ya, Hapus</button>
             </form>
         </div>
     </div>

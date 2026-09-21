@@ -25,7 +25,7 @@ Repositori ini merupakan karya pribadi untuk keperluan tugas mata kuliah wajib y
    ```
 5. Buka `http://localhost:8000/` di browser Anda. (untuk melihat hasil kode di browser)
 
-jika anda hanya inign melihat hasil protofolio atau hasil compile dari kode yang sudah say abuat anda bisa membuka di [https://](https://adriana-ainurrahmah-myportofolio.pws.cs.ui.ac.id/)
+jika anda hanya inign melihat hasil protofolio atau hasil compile dari kode yang sudah say abuat anda bisa membuka di [https://adriana-ainurrahmah-myportofolio.pws.cs.ui.ac.id/](https://adriana-ainurrahmah-myportofolio.pws.cs.ui.ac.id/)
 
 ---
 ## Tugas 1
@@ -81,5 +81,10 @@ Contoh: Jika saya menambahkan atribut baru `link = models.URLField()` di dalam m
 - **Mengapa perlu proses serialization:**
   Objek model Django (*QuerySet* atau instance class Python) adalah objek internal yang tersimpan di memori runtime Python dan tidak dapat dikirim secara langsung melalui protokol HTTP. Protokol HTTP hanya dapat mengirimkan teks atau byte stream. Oleh karena itu, diperlukan proses **serialization**, yaitu konversi dari struktur data internal Python (objek model dengan relasi dan atributnya) menjadi format representasi teks standar (seperti JSON) yang dapat dipahami dan diproses oleh berbagai sistem, bahasa pemrograman, atau perangkat client di sisi frontend.
 
-### AI Disclosure
-Pada pengerjaan Tugas 3 ini, saya menggunakan AI sebagai asisten diskusi dan referensi teknis dalam memahami konsep implementasi `ModelForm`, mekanisme update data dengan parameter `instance`, serta alur serialisasi dan deserialisasi data menggunakan Django Serializer. Saya tetap membaca alur kode secara mandiri, menyesuaikan setiap field model dan form agar selaras dengan data portofolio saya sendiri, serta melakukan pengujian langsung di lingkungan lokal untuk memastikan fungsionalitas CRUD dan API berjalan dengan baik.
+### AI Disclosure & Analisis Kritis
+- **Alat yang digunakan:** Dalam pengerjaan Tugas 3, saya menggunakan AI (LLM) sebagai mitra diskusi konseptual untuk memahami alur kerja `ModelForm` Django, mekanisme pre-populate form untuk edit data menggunakan parameter `instance`, serta proses serialisasi dan deserialisasi JSON pada Django.
+- **Strategi Prompting:** Saya menggunakan strategi prompting berbasis masalah spesifik, seperti: *"Bagaimana memisahkan alur update dan create di Django view dengan ModelForm yang sama?"* dan *"Bagaimana format serializers.deserialize menghasilkan objek Python yang bisa dikirim ke context template?"*.
+- **Keterbatasan AI & Perbaikan Manual Mandiri:**
+  1. **Kode Generik vs Model Nyata:** Kode yang disarankan AI sering kali menggunakan field dummy generik atau contoh Burhan dari modul. Saya secara manual mengoreksi dan mengaitkan field form dengan model portofolio saya sendiri (`title`, `role`, `description`, `link` pada `Project` serta `title`, `category`, `description`, `thumbnail`, `ended_at` pada `Experience`).
+  2. **Styling & Desain:** AI cenderung menghasilkan elemen visual yang kaku (*AI slop* seperti badge status bertumpuk dan kontras warna yang kurang pas di atas background gambar ocean). Saya melakukan perbaikan manual pada CSS dengan menambahkan dark overlay gradient agar keterbacaan tipografi tetap kontras dan mempertahankan estetika personal portofolio.
+  3. **Penyesuaian Test Suite:** Saya menulis dan menyesuaikan unit test mandiri di `main/tests.py` hingga seluruh 18 test kasus berhasil dilewati (100% OK) untuk memastikan tidak ada regresi pada endpoint maupun view.

@@ -4,18 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=11">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=13">
     {% block meta %}
     {% endblock meta %}
 </head>
 <body>
     <header class="site-header">
-        <div class="container">
-            <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
-            <nav>
-                <a href="{% url 'main:show_main' %}">Profile</a>
-                <a href="{% url 'main:show_experience' %}">Experience</a>
-                <a href="{% url 'main:show_projects' %}">Projects</a>
+        <div class="nav-container">
+            <a href="{% url 'main:show_main' %}" class="nav-brand">
+                <span class="nav-brand-name">{{ name }}</span>
+            </a>
+            
+            <nav class="nav-menu">
+                <a href="{% url 'main:show_main' %}" class="nav-link {% if request.resolver_match.url_name == 'show_main' %}active{% endif %}">
+                    Profile
+                </a>
+                <a href="{% url 'main:show_experience' %}" class="nav-link {% if 'experience' in request.resolver_match.url_name %}active{% endif %}">
+                    Experience
+                </a>
+                <a href="{% url 'main:show_projects' %}" class="nav-link {% if 'project' in request.resolver_match.url_name %}active{% endif %}">
+                    Projects
+                </a>
             </nav>
         </div>
     </header>
@@ -24,8 +36,14 @@
     {% endblock content %}
 
     <footer class="site-footer">
-        <div class="container">
+        <div class="container footer-content">
             <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+            <div class="footer-links">
+                <a href="{% url 'main:show_main' %}">Profile</a>
+                <a href="{% url 'main:show_experience' %}">Experience</a>
+                <a href="{% url 'main:show_projects' %}">Projects</a>
+                <a href="{% url 'main:get_projects_json' %}" target="_blank">JSON API</a>
+            </div>
         </div>
     </footer>
 </body>
