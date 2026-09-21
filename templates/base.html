@@ -7,11 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=13">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=15">
     {% block meta %}
     {% endblock meta %}
 </head>
-<body>
+<body class="{% if request.resolver_match.url_name in 'login,register' %}auth-body{% endif %}">
     <header class="site-header">
         <div class="nav-container">
             <a href="{% url 'main:show_main' %}" class="nav-brand">
@@ -28,6 +28,13 @@
                 <a href="{% url 'main:show_projects' %}" class="nav-link {% if 'project' in request.resolver_match.url_name %}active{% endif %}">
                     Projects
                 </a>
+                {% if user.is_authenticated %}
+                <span class="nav-user">{{ user.username }}</span>
+                <a href="{% url 'main:logout' %}" class="nav-link">Logout</a>
+                {% else %}
+                <a href="{% url 'main:login' %}" class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}">Login</a>
+                <a href="{% url 'main:register' %}" class="nav-link {% if request.resolver_match.url_name == 'register' %}active{% endif %}">Register</a>
+                {% endif %}
             </nav>
         </div>
     </header>
@@ -35,6 +42,7 @@
     {% block content %}
     {% endblock content %}
 
+    {% if request.resolver_match.url_name not in 'login,register' %}
     <footer class="site-footer">
         <div class="container footer-content">
             <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
@@ -46,5 +54,6 @@
             </div>
         </div>
     </footer>
+    {% endif %}
 </body>
 </html>

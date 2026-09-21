@@ -13,9 +13,11 @@
                     <h1 class="page-title">Experience</h1>
                     <p class="section-subtitle">Perjalanan profesional dan rekam jejak kepemimpinan.</p>
                 </div>
+                {% if user.is_superuser %}
                 <a href="{% url 'main:create_experience' %}" class="btn-primary-action">
                     + Tambah Pengalaman
                 </a>
+                {% endif %}
             </div>
             
             <div class="experience-timeline-modern">
@@ -33,10 +35,12 @@
 
                     <div class="exp-card-footer">
                         <div class="project-manage-actions">
+                            {% if user.is_superuser %}
                             <a href="{% url 'main:edit_experience' experience.id %}" class="btn-action-edit">
                                 Edit
                             </a>
                             {% include "components/experience_delete_modal.html" with experience=experience %}
+                            {% endif %}
                         </div>
                     </div>
                 </article>
