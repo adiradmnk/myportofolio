@@ -55,3 +55,31 @@ Menyimpan data di model (database) memisahkan logika tampilan dari logika data. 
 - `makemigrations` bertugas melacak setiap perubahan struktur yang kita lakukan pada class Model di Python dan merumuskannya menjadi sebuah file skema instruksi (file migrasi).
 - `migrate` bertugas mengeksekusi instruksi dari file migrasi tersebut secara langsung ke dalam sistem database (menjalankan perintah SQL di balik layar).
 Contoh: Jika saya menambahkan atribut baru `link = models.URLField()` di dalam model `Project`, saya harus menjalankan `makemigrations` agar Django tahu ada kolom baru yang ingin ditambahkan, lalu dilanjutkan dengan `migrate` agar kolom `link` tersebut benar-benar ditambahkan ke tabel pada file `db.sqlite3`.
+
+---
+## Tugas 3
+
+### 1. Mengapa menggunakan ModelForm pada Django alih-alih membuat form HTML secara manual, serta alasan penambahan `{% csrf_token %}`
+- **Alasan menggunakan ModelForm:**
+  ModelForm merupakan fitur bawaan Django yang secara otomatis menghasilkan form berdasarkan skema model database yang sudah didefinisikan. Jika membuat form HTML manual, kita harus menulis setiap tag input secara berulang, mengurus sanitasi dan pemetaan data `request.POST` satu per satu ke objek model, serta mengimplementasikan validasi secara manual. Dengan ModelForm, validasi tipe data (seperti URL, teks, panjang karakter), pembuatan elemen input yang sesuai, hingga fungsi penyimpanan langsung (`form.save()`) ditangani secara otomatis, bersih, dan meminimalisir redundansi kode serta potensi bug.
+- **Pentingnya `{% csrf_token %}`:**
+  Tag `{% csrf_token %}` wajib ditambahkan pada setiap form dengan metode POST untuk melindungi aplikasi web dari serangan *Cross-Site Request Forgery* (CSRF). CSRF adalah serangan di mana situs jahat memanfaatkan sesi login atau kredensial pengguna yang tersimpan di browser untuk mengirimkan permintaan tidak sah (seperti mengubah atau menghapus data) ke server aplikasi kita tanpa disadari pengguna. Token CSRF bekerja sebagai kunci rahasia unik sekali pakai yang dibuat oleh server dan diverifikasi kecocokannya saat form dikirimkan kembali; jika token tidak cocok atau tidak ada, Django akan menolak permintaan tersebut.
+
+### 2. Mengapa JSON lebih disukai dibandingkan XML dalam pengembangan aplikasi web modern
+- **Ukuran lebih ringkas dan efisien:** JSON menggunakan sintaks key-value dengan kurung kurawal yang minimalis, sedangkan XML membutuhkan tag pembuka dan penutup (`<tag></tag>`) untuk setiap data sehingga ukuran payload XML jauh lebih besar dan boros bandwidth.
+- **Parsing langsung dan integrasi alami:** Format data JSON diturunkan langsung dari objek JavaScript. Di sisi client (browser), JSON dapat di-parse secara instan menjadi objek native menggunakan fungsi bawaan `JSON.parse()` atau otomatis oleh library/API seperti `fetch().json()`. Sebaliknya, XML memerlukan *DOM parser* yang lebih berat dan kompleks untuk membaca hierarki tagnya.
+- **Struktur data yang fleksibel:** JSON secara langsung merepresentasikan tipe data standar seperti string, number, boolean, array, dan null tanpa memerlukan skema definisi tipe yang rumit seperti XML Schema (XSD). Hal ini membuat JSON menjadi format standar *de facto* untuk arsitektur RESTful API modern.
+
+### 3. Alur pengembalian data portofolio dalam bentuk JSON dan mengapa perlu serialization
+- **Alur kerja view JSON:**
+  1. Klien mengirim permintaan HTTP GET ke endpoint API (misal `/api/projects/` atau `/api/experience/`).
+  2. URL resolver Django mengarahkan permintaan ke fungsi view terkait (misal `get_projects_json`).
+  3. View melakukan query ke database melalui model ORM (misal `Project.objects.all()`), yang menghasilkan *QuerySet* berisi objek-objek model Python.
+  4. Objek model tersebut diteruskan ke serializer bawaan Django (`serializers.serialize("json", ...)`).
+  5. Serializer mengubah objek Python menjadi string terformat JSON.
+  6. View mengembalikan data tersebut ke klien dalam bentuk `HttpResponse` dengan header `content_type="application/json"`.
+- **Mengapa perlu proses serialization:**
+  Objek model Django (*QuerySet* atau instance class Python) adalah objek internal yang tersimpan di memori runtime Python dan tidak dapat dikirim secara langsung melalui protokol HTTP. Protokol HTTP hanya dapat mengirimkan teks atau byte stream. Oleh karena itu, diperlukan proses **serialization**, yaitu konversi dari struktur data internal Python (objek model dengan relasi dan atributnya) menjadi format representasi teks standar (seperti JSON) yang dapat dipahami dan diproses oleh berbagai sistem, bahasa pemrograman, atau perangkat client di sisi frontend.
+
+### AI Disclosure
+Pada pengerjaan Tugas 3 ini, saya menggunakan AI sebagai asisten diskusi dan referensi teknis dalam memahami konsep implementasi `ModelForm`, mekanisme update data dengan parameter `instance`, serta alur serialisasi dan deserialisasi data menggunakan Django Serializer. Saya tetap membaca alur kode secara mandiri, menyesuaikan setiap field model dan form agar selaras dengan data portofolio saya sendiri, serta melakukan pengujian langsung di lingkungan lokal untuk memastikan fungsionalitas CRUD dan API berjalan dengan baik.

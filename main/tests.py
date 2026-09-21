@@ -107,3 +107,69 @@ class MainTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/xml")
         self.assertIn("Proyek XML", response.content.decode("utf-8"))
+
+    def test_create_experience_view(self):
+        response = self.client.get(reverse("main:create_experience"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "experience_form.html")
+
+        post_data = {
+            "title": "Teaching Assistant",
+            "category": "part-time",
+            "description": "Membantu asistensi lab.",
+            "thumbnail": "",
+            "ended_at": "",
+        }
+        post_response = self.client.post(reverse("main:create_experience"), post_data)
+        self.assertEqual(post_response.status_code, 302)
+        self.assertTrue(Experience.objects.filter(title="Teaching Assistant").exists())
+
+    def test_edit_experience_view(self):
+        edit_url = reverse("main:edit_experience", kwargs={"experience_id": self.experience.id})
+        response = self.client.get(edit_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "experience_edit.html")
+
+        post_data = {
+            "title": "Senior Web Developer Intern",
+            "category": "internship",
+            "description": "Deskripsi baru terupdate",
+            "thumbnail": "",
+            "ended_at": "",
+        }
+        post_response = self.client.post(edit_url, post_data)
+        self.assertEqual(post_response.status_code, 302)
+        self.experience.refresh_from_db()
+        self.assertEqual(self.experience.title, "Senior Web Developer Intern")
+
+    def test_delete_experience_view(self):
+        exp = Experience.objects.create(title="Exp to Delete", description="test", category="freelance")
+        delete_url = reverse("main:delete_experience", kwargs={"experience_id": exp.id})
+        response = self.client.post(delete_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Experience.objects.filter(id=exp.id).exists())
+
+    def test_get_experience_json(self):
+        response = self.client.get(reverse("main:get_experience_json"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/json")
+        self.assertIn("Intern Web Developer", response.content.decode("utf-8"))
+
+    def test_edit_project_view(self):
+        from main.models import Project
+        p = Project.objects.create(title="Old Title", role="Dev", description="Desc")
+        edit_url = reverse("main:edit_project", kwargs={"project_id": p.id})
+        response = self.client.get(edit_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "projects_edit.html")
+
+        post_data = {
+            "title": "New Title",
+            "role": "Lead Dev",
+            "description": "Updated Desc",
+            "link": "https://example.com",
+        }
+        post_response = self.client.post(edit_url, post_data)
+        self.assertEqual(post_response.status_code, 302)
+        p.refresh_from_db()
+        self.assertEqual(p.title, "New Title")
