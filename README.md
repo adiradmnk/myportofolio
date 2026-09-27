@@ -88,3 +88,30 @@ Contoh: Jika saya menambahkan atribut baru `link = models.URLField()` di dalam m
   1. **Kode Generik vs Model Nyata:** Kode yang disarankan AI sering kali menggunakan field dummy generik atau contoh Burhan dari modul. Saya secara manual mengoreksi dan mengaitkan field form dengan model portofolio saya sendiri (`title`, `role`, `description`, `link` pada `Project` serta `title`, `category`, `description`, `thumbnail`, `ended_at` pada `Experience`).
   2. **Styling & Desain:** AI cenderung menghasilkan elemen visual yang kaku (*AI slop* seperti badge status bertumpuk dan kontras warna yang kurang pas di atas background gambar ocean). Saya melakukan perbaikan manual pada CSS dengan menambahkan dark overlay gradient agar keterbacaan tipografi tetap kontras dan mempertahankan estetika personal portofolio.
   3. **Penyesuaian Test Suite:** Saya menulis dan menyesuaikan unit test mandiri di `main/tests.py` hingga seluruh 18 test kasus berhasil dilewati (100% OK) untuk memastikan tidak ada regresi pada endpoint maupun view.
+
+---
+## Tugas 4
+
+Di tugas 4 ini, saya melanjutkan proyek portofolio dengan menerapkan sistem autentikasi, session, cookie `last_login`, dan pembagian peran (hak akses) pengguna. Di sini saya juga menambahkan satu peran baru yaitu **Editor** dengan memanfaatkan fitur `Group` bawaan dari Django.
+
+### 1. Hak Akses Tiap Peran Pengguna
+Agar data portofolio tetap aman dan tidak sembarangan diubah oleh orang lain, saya membatasi hak akses pengguna baik dari sisi server (view) maupun dari antarmuka template:
+
+| Peran Pengguna | Melihat Portofolio | Kasih / Batal Star | Edit Data | Tambah / Hapus Data |
+|:---|:---:|:---:|:---:|:---:|
+| **Pengunjung (Belum Login)** | Bisa | Nggak bisa (diarahkan ke login) | Nggak bisa (diarahkan ke login) | Nggak bisa (diarahkan ke login) |
+| **Pengguna Biasa** | Bisa | Bisa | Nggak bisa (403 Forbidden) | Nggak bisa (403 Forbidden) |
+| **Editor (Grup 'Editor')** | Bisa | Bisa | Bisa | Nggak bisa (403 Forbidden) |
+| **Pemilik Portofolio (Superuser)** | Bisa | Bisa | Bisa | Bisa |
+
+### 2. Penerapan Peran Editor dan Fitur Star
+- **Grup Editor:** Saya membuat grup baru bernama `Editor` lewat Django Admin. Di bagian view, saya membuat fungsi pembantu `is_editor_or_admin(user)` untuk mengecek apakah user yang sedang login adalah superuser atau tergabung dalam grup `Editor`. Kalau pengguna masuk ke grup ini, mereka bisa membuka halaman edit dan mengubah data proyek atau pengalaman, tapi kalau mereka coba-coba menambah atau menghapus data, server bakal langsung memunculkan error `403 Forbidden`.
+- **Fitur Star:** Saya menambahkan field `starred_by = models.ManyToManyField(User, ...)` pada model `Project` dan `Experience`. Pengguna yang sudah login bisa menekan tombol star untuk memberi apresiasi atau membatalkannya (toggle). Setiap user hanya bisa memberi satu star per proyek atau pengalaman.
+- **Keamanan Data JSON:** Pada endpoint `/api/projects/` dan `/api/experience/`, saya menambahkan opsi `use_natural_foreign_keys=True` pada serializer Django supaya data yang tampil adalah username pemberi star, bukan id angka dari database yang bersifat privat.
+
+### AI Disclosure
+Dalam pengerjaan tugas 4 ini, saya menggunakan AI sebagai teman diskusi dan mencari referensi ketika mengalami kendala:
+- **Cara saya menggunakan AI:** Saya bertanya ke AI bagaimana cara mengecek keanggotaan grup Django pada fungsi view (`request.user.groups.filter(...)`) dan bagaimana membuat tampilan halaman login serta register menjadi pas satu layar tanpa scrollbar.
+- **Koreksi dan penyesuaian mandiri:** AI sempat menyarankan untuk hanya menyembunyikan tombol edit dan delete di template saja. Tapi saya tahu kalau cuma disembunyikan di HTML, orang lain masih bisa mengakses linknya langsung lewat URL. Jadi saya secara manual menambahkan proteksi server-side dengan `raise PermissionDenied` di setiap fungsi view (create, edit, delete). Selain itu, saya juga menyesuaikan padding CSS sendiri agar tampilannya tetap enak dilihat di laptop maupun HP, serta menulis unit test tambahan di `tests.py` sampai semuanya berhasil lolos.
+
+

@@ -10,6 +10,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from main.forms import ExperienceForm, ProjectForm
 from main.models import Experience, Project
 
+def is_editor_or_admin(user):
+    return user.is_authenticated and (user.is_superuser or user.groups.filter(name="Editor").exists())
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -58,7 +61,7 @@ def show_main(request):
 
 def get_experience_json(request):
     experiences = Experience.objects.all()
-    experiences_json = serializers.serialize("json", experiences)
+    experiences_json = serializers.serialize("json", experiences, use_natural_foreign_keys=True)
     return HttpResponse(experiences_json, content_type="application/json")
 
 def show_experience(request):
@@ -71,6 +74,7 @@ def show_experience(request):
     context = {
         "name": "Adriana Ainurrahmah Damanik",
         "experience_list": experiences,
+        "is_editor": is_editor_or_admin(request.user),
     }
     return render(request, "experience.html", context)
 
@@ -91,7 +95,7 @@ def create_experience(request):
 
 @login_required(login_url="/login/")
 def edit_experience(request, experience_id):
-    if not request.user.is_superuser:
+    if not is_editor_or_admin(request.user):
         raise PermissionDenied
     experience = get_object_or_404(Experience, pk=experience_id)
     form = ExperienceForm(request.POST or None, instance=experience)
@@ -114,6 +118,17 @@ def delete_experience(request, experience_id):
     if request.method == "POST":
         experience.delete()
         messages.success(request, "Pengalaman berhasil dihapus!")
+        return redirect("main:show_experience")
+    return redirect("main:show_experience")
+
+@login_required(login_url="/login/")
+def toggle_experience_star(request, experience_id):
+    experience = get_object_or_404(Experience, pk=experience_id)
+    if request.method == "POST":
+        if request.user in experience.starred_by.all():
+            experience.starred_by.remove(request.user)
+        else:
+            experience.starred_by.add(request.user)
         return redirect("main:show_experience")
     return redirect("main:show_experience")
 
@@ -145,6 +160,7 @@ def show_projects(request):
         "name": "Adriana Ainurrahmah Damanik",
         "project_list": projects,
         "title_query": title_query,
+        "is_editor": is_editor_or_admin(request.user),
     }
     return render(request, "projects.html", context)
 
@@ -165,7 +181,7 @@ def create_project(request):
 
 @login_required(login_url="/login/")
 def edit_project(request, project_id):
-    if not request.user.is_superuser:
+    if not is_editor_or_admin(request.user):
         raise PermissionDenied
     project = get_object_or_404(Project, pk=project_id)
     form = ProjectForm(request.POST or None, instance=project)
@@ -201,3 +217,4 @@ def toggle_star(request, project_id):
             project.starred_by.add(request.user)
         return redirect("main:show_projects")
     return redirect("main:show_projects")
+

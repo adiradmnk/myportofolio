@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -8,6 +8,9 @@ class MainTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="testuser", password="password123")
         self.admin = User.objects.create_superuser(username="adminuser", password="password123")
+        self.editor_group = Group.objects.create(name="Editor")
+        self.editor = User.objects.create_user(username="editoruser", password="password123")
+        self.editor.groups.add(self.editor_group)
         self.experience = Experience.objects.create(
             title="Intern Web Developer",
             description="Memimpin riset dan pengembangan EDLIG.",
@@ -181,10 +184,47 @@ class MainTest(TestCase):
         p = Project.objects.create(title="P", role="R", description="D")
         response = self.client.get(reverse("main:create_project"))
         self.assertEqual(response.status_code, 403)
+        edit_resp = self.client.get(reverse("main:edit_project", kwargs={"project_id": p.id}))
+        self.assertEqual(edit_resp.status_code, 403)
         del_resp = self.client.post(reverse("main:delete_project", kwargs={"project_id": p.id}))
         self.assertEqual(del_resp.status_code, 403)
 
-    def test_toggle_star(self):
+    def test_editor_can_edit_but_cannot_create_or_delete(self):
+        self.client.login(username="editoruser", password="password123")
+        p = Project.objects.create(title="Editor Project", role="R", description="D")
+
+        # Editor can edit project
+        edit_url = reverse("main:edit_project", kwargs={"project_id": p.id})
+        get_edit_resp = self.client.get(edit_url)
+        self.assertEqual(get_edit_resp.status_code, 200)
+        post_edit_resp = self.client.post(edit_url, {
+            "title": "Editor Project Updated",
+            "role": "Lead",
+            "description": "Updated by editor",
+            "link": "",
+        })
+        self.assertEqual(post_edit_resp.status_code, 302)
+        p.refresh_from_db()
+        self.assertEqual(p.title, "Editor Project Updated")
+
+        # Editor can edit experience
+        exp_edit_url = reverse("main:edit_experience", kwargs={"experience_id": self.experience.id})
+        get_exp_edit = self.client.get(exp_edit_url)
+        self.assertEqual(get_exp_edit.status_code, 200)
+
+        # Editor cannot create project or experience
+        create_p_resp = self.client.get(reverse("main:create_project"))
+        self.assertEqual(create_p_resp.status_code, 403)
+        create_e_resp = self.client.get(reverse("main:create_experience"))
+        self.assertEqual(create_e_resp.status_code, 403)
+
+        # Editor cannot delete project or experience
+        del_p_resp = self.client.post(reverse("main:delete_project", kwargs={"project_id": p.id}))
+        self.assertEqual(del_p_resp.status_code, 403)
+        del_e_resp = self.client.post(reverse("main:delete_experience", kwargs={"experience_id": self.experience.id}))
+        self.assertEqual(del_e_resp.status_code, 403)
+
+    def test_toggle_star_project(self):
         self.client.login(username="testuser", password="password123")
         p = Project.objects.create(title="Star Test", role="Dev", description="Desc")
         star_url = reverse("main:toggle_star", kwargs={"project_id": p.id})
@@ -196,6 +236,18 @@ class MainTest(TestCase):
         resp2 = self.client.post(star_url)
         self.assertEqual(resp2.status_code, 302)
         self.assertNotIn(self.user, p.starred_by.all())
+
+    def test_toggle_star_experience(self):
+        self.client.login(username="testuser", password="password123")
+        star_url = reverse("main:toggle_experience_star", kwargs={"experience_id": self.experience.id})
+
+        resp = self.client.post(star_url)
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn(self.user, self.experience.starred_by.all())
+
+        resp2 = self.client.post(star_url)
+        self.assertEqual(resp2.status_code, 302)
+        self.assertNotIn(self.user, self.experience.starred_by.all())
 
     def test_auth_flow(self):
         reg_response = self.client.get(reverse("main:register"))
@@ -212,3 +264,4 @@ class MainTest(TestCase):
 
         logout_response = self.client.get(reverse("main:logout"))
         self.assertEqual(logout_response.status_code, 302)
+
