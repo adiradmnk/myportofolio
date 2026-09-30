@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group, User
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from main.forms import ProjectForm
 from main.models import Experience, Project
 
 class MainTest(TestCase):
@@ -62,16 +63,77 @@ class MainTest(TestCase):
         self.assertTemplateUsed(response, "projects.html")
 
     def test_projects_page_with_data(self):
-        p = Project.objects.create(title="BEFU", role="Project Leader", description="Aplikasi keren")
+        Project.objects.create(title="BEFU", role="Project Leader", description="Aplikasi keren")
         response = self.client.get(reverse("main:show_projects"))
-        self.assertContains(response, "BEFU")
-        self.assertContains(response, "Project Leader")
-        self.assertContains(response, "Aplikasi keren")
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "projects.html")
+        self.assertContains(response, 'id="project-search-form"')
+
+        json_resp = self.client.get(reverse("main:get_projects_json"))
+        self.assertEqual(json_resp.status_code, 200)
+        self.assertIn("BEFU", json_resp.content.decode("utf-8"))
+        self.assertIn("Project Leader", json_resp.content.decode("utf-8"))
 
     def test_empty_projects_page(self):
         Project.objects.all().delete()
         response = self.client.get(reverse("main:show_projects"))
-        self.assertContains(response, "Belum ada proyek yang ditambahkan.")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Belum ada proyek")
+
+    def test_create_project_ajax_success(self):
+        self.client.login(username="adminuser", password="password123")
+        post_data = {
+            "title": "Proyek AJAX Baru",
+            "role": "Fullstack Engineer",
+            "description": "Dibuat dengan AJAX",
+            "link": "https://example.com/ajax",
+        }
+        response = self.client.post(reverse("main:create_project_ajax"), post_data)
+        self.assertEqual(response.status_code, 201)
+        data = response.json()
+        self.assertEqual(data["message"], "Proyek berhasil ditambahkan.")
+        self.assertTrue(Project.objects.filter(title="Proyek AJAX Baru").exists())
+
+    def test_create_project_ajax_unauthorized(self):
+        response = self.client.post(reverse("main:create_project_ajax"), {"title": "Test"})
+        self.assertEqual(response.status_code, 403)
+
+        self.client.login(username="testuser", password="password123")
+        response = self.client.post(reverse("main:create_project_ajax"), {"title": "Test"})
+        self.assertEqual(response.status_code, 403)
+
+    def test_create_project_ajax_invalid(self):
+        self.client.login(username="adminuser", password="password123")
+        response = self.client.post(reverse("main:create_project_ajax"), {
+            "title": "",
+            "role": "Role",
+            "description": "Desc",
+        })
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn("errors", data)
+
+    def test_project_form_xss_protection(self):
+        form_data = {
+            "title": "<b>Proyek Bersih</b>",
+            "role": "<b>Frontend</b> Lead",
+            "description": "<p>Deskripsi aman</p>",
+            "link": "https://example.com",
+        }
+        form = ProjectForm(data=form_data)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["title"], "Proyek Bersih")
+        self.assertEqual(form.cleaned_data["role"], "Frontend Lead")
+        self.assertEqual(form.cleaned_data["description"], "Deskripsi aman")
+
+        empty_html_form = ProjectForm(data={
+            "title": "<img src=x onerror=alert(1)>",
+            "role": "Dev",
+            "description": "Desc",
+        })
+        self.assertFalse(empty_html_form.is_valid())
+        self.assertIn("title", empty_html_form.errors)
+
 
     def test_create_project_view(self):
         self.client.login(username="adminuser", password="password123")
@@ -193,7 +255,6 @@ class MainTest(TestCase):
         self.client.login(username="editoruser", password="password123")
         p = Project.objects.create(title="Editor Project", role="R", description="D")
 
-        # Editor can edit project
         edit_url = reverse("main:edit_project", kwargs={"project_id": p.id})
         get_edit_resp = self.client.get(edit_url)
         self.assertEqual(get_edit_resp.status_code, 200)
@@ -207,18 +268,15 @@ class MainTest(TestCase):
         p.refresh_from_db()
         self.assertEqual(p.title, "Editor Project Updated")
 
-        # Editor can edit experience
         exp_edit_url = reverse("main:edit_experience", kwargs={"experience_id": self.experience.id})
         get_exp_edit = self.client.get(exp_edit_url)
         self.assertEqual(get_exp_edit.status_code, 200)
 
-        # Editor cannot create project or experience
         create_p_resp = self.client.get(reverse("main:create_project"))
         self.assertEqual(create_p_resp.status_code, 403)
         create_e_resp = self.client.get(reverse("main:create_experience"))
         self.assertEqual(create_e_resp.status_code, 403)
 
-        # Editor cannot delete project or experience
         del_p_resp = self.client.post(reverse("main:delete_project", kwargs={"project_id": p.id}))
         self.assertEqual(del_p_resp.status_code, 403)
         del_e_resp = self.client.post(reverse("main:delete_experience", kwargs={"experience_id": self.experience.id}))
