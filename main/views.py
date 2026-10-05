@@ -61,23 +61,61 @@ def show_main(request):
     return render(request, "index.html", context)
 
 def get_experience_json(request):
-    experiences = Experience.objects.all()
-    experiences_json = serializers.serialize("json", experiences, use_natural_foreign_keys=True)
-    return HttpResponse(experiences_json, content_type="application/json")
+    query = request.GET.get("q", "").strip() or request.GET.get("title", "").strip()
+    category = request.GET.get("category", "").strip()
+    experiences = Experience.objects.prefetch_related('starred_by').all()
+    if query:
+        experiences = experiences.filter(title__icontains=query)
+    if category and category != "all":
+        experiences = experiences.filter(category=category)
+
+    data = []
+    for exp in experiences:
+        starred_users = exp.starred_by.all()
+        is_starred = request.user in starred_users if request.user.is_authenticated else False
+        starred_by_names = ", ".join([u.username for u in starred_users])
+        data.append({
+            "pk": str(exp.id),
+            "fields": {
+                "title": exp.title,
+                "category": exp.category,
+                "category_display": exp.get_category_display(),
+                "description": exp.description,
+                "thumbnail": exp.thumbnail,
+                "is_ongoing": exp.is_ongoing,
+                "ended_at": exp.ended_at.strftime("%Y-%m-%d") if exp.ended_at else None,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+            }
+        })
+    return JsonResponse(data, safe=False)
 
 def show_experience(request):
-    json_response = get_experience_json(request)
-    experiences = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    experiences = [exp.object for exp in experiences]
+    query = request.GET.get("q", "").strip() or request.GET.get("title", "").strip()
     context = {
         "name": "Adriana Ainurrahmah Damanik",
-        "experience_list": experiences,
+        "query": query,
+        "form": ExperienceForm(),
         "is_editor": is_editor_or_admin(request.user),
     }
     return render(request, "experience.html", context)
+
+@require_POST
+def create_experience_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan pengalaman."},
+            status=403,
+        )
+    form = ExperienceForm(request.POST)
+    if form.is_valid():
+        experience = form.save()
+        return JsonResponse(
+            {"message": "Pengalaman berhasil ditambahkan.", "pk": str(experience.id)},
+            status=201,
+        )
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 @login_required(login_url="/login/")
 def create_experience(request):

@@ -56,6 +56,12 @@ Menyimpan data di model (database) memisahkan logika tampilan dari logika data. 
 - `migrate` bertugas mengeksekusi instruksi dari file migrasi tersebut secara langsung ke dalam sistem database (menjalankan perintah SQL di balik layar).
 Contoh: Jika saya menambahkan atribut baru `link = models.URLField()` di dalam model `Project`, saya harus menjalankan `makemigrations` agar Django tahu ada kolom baru yang ingin ditambahkan, lalu dilanjutkan dengan `migrate` agar kolom `link` tersebut benar-benar ditambahkan ke tabel pada file `db.sqlite3`.
 
+### AI Disclosure
+Dalam pengerjaan Tugas 2 ini, saya memanfaatkan AI sebagai teman diskusi untuk memahami alur dasar arsitektur MVT di Django:
+- **Cara saya menggunakan AI:** Saya berdiskusi dengan AI untuk memahami bagaimana pemetaan routing URL bekerja dari level proyek (`portofolio/urls.py`) ke level aplikasi (`main/urls.py`), serta bagaimana cara meneruskan *QuerySet* dari fungsi view ke dalam template context menggunakan dictionary agar bisa di-looping menggunakan `{% for %}`.
+- **Koreksi dan penyesuaian mandiri:** Contoh kode awal dari AI sering kali menggunakan nama model dan field yang generik atau field bawaan tutorial. Saya secara mandiri merancang dan menyesuaikan field pada model portofolio saya sendiri (seperti atribut `role` dan `link` pada `Project`). Selain itu, saya mengatur penulisan sintaks URL patterns secara manual agar sesuai konvensi namespace Django (`app_name = "main"`), serta memastikan konfigurasi `settings.py` (terutama `TEMPLATES` dan `INSTALLED_APPS`) terpasang dengan benar.
+
+
 ---
 ## Tugas 3
 
@@ -113,5 +119,38 @@ Agar data portofolio tetap aman dan tidak sembarangan diubah oleh orang lain, sa
 Dalam pengerjaan tugas 4 ini, saya menggunakan AI sebagai teman diskusi dan mencari referensi ketika mengalami kendala:
 - **Cara saya menggunakan AI:** Saya bertanya ke AI bagaimana cara mengecek keanggotaan grup Django pada fungsi view (`request.user.groups.filter(...)`) dan bagaimana membuat tampilan halaman login serta register menjadi pas satu layar tanpa scrollbar.
 - **Koreksi dan penyesuaian mandiri:** AI sempat menyarankan untuk hanya menyembunyikan tombol edit dan delete di template saja. Tapi saya tahu kalau cuma disembunyikan di HTML, orang lain masih bisa mengakses linknya langsung lewat URL. Jadi saya secara manual menambahkan proteksi server-side dengan `raise PermissionDenied` di setiap fungsi view (create, edit, delete). Selain itu, saya juga menyesuaikan padding CSS sendiri agar tampilannya tetap enak dilihat di laptop maupun HP, serta menulis unit test tambahan di `tests.py` sampai semuanya berhasil lolos.
+
+---
+## Tugas 5
+
+### 1. Pengertian Debouncing dan Pentingnya pada Fitur Pencarian AJAX
+**Debouncing** adalah teknik pemrograman untuk membatasi frekuensi pemanggilan suatu fungsi dengan cara menunda eksekusinya sampai tidak ada lagi event baru yang dipicu selama rentang waktu tertentu (misalnya jeda 300 milidetik). Jika sebelum waktu tunggu tersebut habis pengguna memicu event kembali (misalnya menekan tombol huruf berikutnya), maka timer yang sedang berjalan akan dibatalkan (`clearTimeout`) dan timer baru akan dimulai kembali dari nol.
+
+Teknik ini sangat penting diterapkan pada fitur pencarian berbasis AJAX karena beberapa alasan utama:
+- **Mencegah Beban Berlebih pada Server dan Pemborosan Bandwidth:** Ketika pengguna mengetik kata kunci pada kolom pencarian (event `input`), pencarian tanpa debouncing akan mengirimkan permintaan HTTP ke server untuk setiap penekanan tombol. Sebagai contoh, mengetik kata "Software" akan memicu 8 kali *request* berturut-turut. Dengan debouncing, browser hanya akan mengirimkan satu permintaan ke server setelah pengguna benar-benar berhenti mengetik sejenak.
+- **Menghindari Masalah Race Condition:** Karena pemanggilan AJAX bersifat asinkron, waktu tiba respons dari server tidak dapat dijamin berurutan. Tanpa debouncing, respons dari permintaan pertama (misalnya untuk huruf "S") bisa saja tiba lebih lambat dibandingkan respons dari permintaan kata lengkap ("Software"). Hal ini berpotensi menimpa data terbaru dengan data lama yang sudah tidak relevan (*stale data*). Debouncing bersama dengan pembatalan request lama lewat `AbortController` menjamin antarmuka web selalu menampilkan data yang akurat sesuai kata kunci terakhir pengguna.
+
+### 2. Fungsi Penggunaan `await` saat Menggunakan `fetch()` dan Akibat jika Tidak Digunakan
+Fungsi `fetch()` adalah fungsi bawaan browser (Web API) yang bersifat asinkron dan selalu mengembalikan sebuah objek `Promise` yang merepresentasikan proses permintaan jaringan yang sedang berlangsung. Keyword `await` hanya dapat digunakan di dalam `async function` dan berfungsi untuk menunda (*pause*) eksekusi baris kode berikutnya hingga `Promise` dari `fetch()` selesai diproses (*resolved*) serta menghasilkan objek `Response` yang sebenarnya. Dengan menggunakan `await`, kode asinkron dapat ditulis dengan struktur yang bersih, berurutan, dan mudah dibaca tanpa harus membuat rantai callback bertingkat (`.then()`).
+
+**Apa yang terjadi jika kita tidak menggunakan `await`:**
+Jika kita memanggil `const response = fetch(url)` tanpa keyword `await`, variabel `response` tidak akan berisi objek hasil dari server, melainkan hanya akan menampung objek `Promise <pending>`. Jika baris kode selanjutnya mencoba mengakses properti dari objek tersebut (seperti mengecek `response.ok` atau menjalankan `response.json()`), operasi tersebut akan gagal atau mengembalikan error/Promise lain yang belum selesai. Akibatnya, alur eksekusi akan terus berjalan sebelum data dari server berhasil diunduh, menyebabkan data yang ingin diproses bernilai `undefined`, antarmuka gagal merender kartu data, atau bahkan aplikasi mengalami error (*crash*) di sisi browser pengguna.
+
+### 3. Serangan XSS (Cross-Site Scripting) dan Mengapa Data via AJAX/JavaScript Lebih Rentan daripada Template Django
+**Cross-Site Scripting (XSS)** adalah jenis serangan keamanan siber di mana penyerang berhasil menyisipkan kode skrip berbahaya (umumnya JavaScript) ke dalam aplikasi web yang kemudian dieksekusi oleh browser pengguna lain yang mengunjungi halaman tersebut. Pada jenis *Stored XSS*, kode berbahaya tersebut disimpan ke dalam database (misalnya diselipkan pada nama proyek atau deskripsi pengalaman) sehingga akan selalu dieksekusi setiap kali data tersebut diambil dan ditampilkan ke antarmuka pengguna. Jika berhasil, penyerang dapat mencuri cookie sensitif pengguna (seperti session id atau token CSRF), menjalankan perintah tidak sah atas nama pengguna, maupun merusak tampilan website.
+
+**Mengapa data yang ditampilkan melalui AJAX/JavaScript lebih rentan:**
+- **Auto-Escaping pada Template Django:** Saat kita merender data langsung menggunakan template engine Django (misalnya dengan sintaks `{{ experience.title }}`), Django secara otomatis menerapkan mekanisme *auto-escaping*. Karakter-karakter khusus HTML seperti `<`, `>`, `&`, `"`, dan `'` akan diubah secara otomatis menjadi karakter entitas aman (`&lt;`, `&gt;`, `&quot;`, dll.). Dengan begitu, teks seperti `<script>alert(1)</script>` akan ditampilkan murni sebagai teks biasa oleh browser, bukan dieksekusi sebagai tag elemen HTML.
+- **Ketiadaan Proteksi Otomatis saat Beralih ke AJAX:** Ketika data diambil lewat AJAX dalam format JSON lalu dirakit ke antarmuka menggunakan JavaScript (misalnya lewat properti `innerHTML` atau template literal), peran template engine Django berakhir di pembuatan JSON. Browser tidak memiliki fitur auto-escaping bawaan saat menyisipkan string ke dalam `innerHTML`. Jika nilai teks dari JSON langsung digabungkan ke elemen HTML tanpa disanitasi, browser akan menganggap tag berbahaya tersebut sebagai elemen HTML/JS sungguhan dan langsung menjalankannya. Oleh sebab itu, rendering via JavaScript menuntut penanganan keamanan manual yang ketat, baik melalui fungsi sanitasi sisi klien seperti `escapeHtml()` sebelum data disuntikkan ke DOM, maupun pembersihan tag berbahaya di sisi server menggunakan `strip_tags()` pada method `clean_<field>` di Django `ModelForm`.
+
+### AI Disclosure & Analisis Kritis
+- **Alat yang Digunakan:** Saya menggunakan bantuan AI (LLM) sebagai mitra diskusi konseptual untuk mendalami mekanisme `AbortController` pada Fetch API, integrasi header `X-CSRFToken` pada pengiriman data multipart form via AJAX, serta pemanfaatan Popover API untuk modal interaktif tanpa dependensi pustaka luar.
+- **Strategi Prompting:** Saya menerapkan prompting berbasis skenario konkret, seperti: *"Bagaimana cara menghentikan fetch request sebelumnya yang belum selesai saat pengguna masih mengetik pencarian?"* dan *"Bagaimana format response JsonResponse manual di Django agar menyertakan relasi ManyToMany untuk informasi star?"*.
+- **Analisis Kritis Keterbatasan AI & Perbaikan Mandiri Mahasiswa:**
+  1. **Celah XSS pada Boilerplate AI:** Kode contoh yang sering diberikan oleh AI langsung menyematkan variabel JSON ke dalam `innerHTML` tanpa proses escaping. Menyadari risiko celah XSS ini, saya secara manual membuat fungsi `escapeHtml()` di JavaScript untuk menyaring kelima karakter sensitif HTML pada seluruh teks yang dirender, serta menambahkan validasi `strip_tags()` dan penolakan input kosong di method `clean_title()` pada `ExperienceForm`.
+  2. **Pengabaian Otorisasi Server-Side:** AI sering kali hanya menyarankan untuk menyembunyikan modal tambah data di template HTML bagi non-admin. Saya memahami bahwa hal tersebut tidak aman karena endpoint POST tetap bisa ditembak langsung via HTTP request. Oleh karena itu, saya mengimplementasikan pengecekan hak akses tegas di sisi server pada fungsi view `create_experience_ajax` dengan mengembalikan status `403 Forbidden` jika pengguna bukan superuser.
+  3. **Inovasi Fitur Ekstra (Rubrik 4):** Di luar materi dasar tutorial, saya berinisiatif merancang dan menambahkan fitur filter kategori interaktif (*category filter pills*) pada halaman Experience sehingga pengguna dapat memfilter pengalaman (Internship, Research, Full-Time, Freelance, dll.) secara instan tanpa memuat ulang halaman.
+  4. **Verifikasi Test Suite Mandiri:** Saya memperluas cakupan unit test di `main/tests.py` hingga mencapai 32 pengujian menyeluruh (mencakup pengujian respons JSON, otorisasi peran, validasi error 400, dan pembersihan XSS) dengan status kelulusan 100% OK.
+
 
 
