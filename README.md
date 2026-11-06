@@ -53,7 +53,9 @@ jika anda hanya inign melihat hasil protofolio atau hasil compile dari kode yang
 ## Tugas 1
 
 **1. Penggunaan elemen semantik HTML5**
-Ya, saya menggunakan elemen semantik HTML5 seperti `<section>` untuk membagi bagian 'Skills' dan 'Projects', serta `<article>` untuk masing-masing kartu proyek individual. Penggunaan elemen ini sangat membantu dalam menyusun static web karena memberikan struktur logika yang jelas tanpa harus bergantung pada banyak tag `<div>` yang membingungkan 
+Ya, saya menggunakan elemen semantik HTML5 seperti `<section>` untuk membagi bagian 'Profile', 'About Me', dan 'Skills' di `index.html`, serta `<article>` untuk kartu About Me yang berisi nama, NPM, dan program studi. Kartu proyek dan pengalaman di halaman Projects dan Experience juga dirender sebagai `<article>`. Penggunaan elemen ini sangat membantu dalam menyusun static web karena memberikan struktur logika yang jelas tanpa harus bergantung pada banyak tag `<div>` yang membingungkan.
+
+> **Catatan revisi (feedback Tugas 1):** sebelumnya README menyebut `<article>` padahal `index.html` belum memakainya, dan NPM belum tampil di halaman. Keduanya sudah diperbaiki dengan menambahkan bagian About Me berbentuk `<article>` yang menampilkan NPM.
 
 **2. Tantangan Responsive Layout**
 Tantangan utamanya adalah mengelola hierarki informasi ketika ukuran layar menyusut ke mobile. Saya harus mengevaluasi ukuran elemen agar tidak saling berdempetan atau overflow. Solusinya, saya memprioritaskan pemisahan grid pada desktop sehingga otomatis berubah menjadi tumpukan vertikal pada layar mobile.
