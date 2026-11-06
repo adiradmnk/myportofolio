@@ -1905,3 +1905,40 @@ h1, .brand {
 #error .btn-secondary-action {
     margin-top: 1rem;
 }
+
+.about {
+    padding: 4rem 0 0;
+}
+
+.about-card {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1.75rem;
+    background: rgba(15, 23, 42, 0.6);
+}
+
+.about-bio {
+    color: var(--ink);
+    line-height: 1.7;
+    margin: 0 0 1.5rem;
+}
+
+.about-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin: 0;
+}
+
+.about-details dt {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.about-details dd {
+    margin: 0.25rem 0 0;
+    color: var(--ink);
+    font-weight: 600;
+}

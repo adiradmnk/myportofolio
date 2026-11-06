@@ -25,6 +25,12 @@ class MainTest(TestCase):
         self.assertNotContains(response, self.experience.title)
         self.assertContains(response, f'href="{reverse("main:show_experience")}"')
 
+    def test_main_page_shows_about_me(self):
+        response = self.client.get(reverse("main:show_main"))
+        self.assertContains(response, "<article", html=False)
+        self.assertContains(response, "2506656375")
+        self.assertContains(response, "S1 Ilmu Komputer")
+
     def test_nonexistent_page_returns_404(self):
         response = self.client.get("/halaman-yang-tidak-ada/")
         self.assertEqual(response.status_code, 404)
