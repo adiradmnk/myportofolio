@@ -12,6 +12,8 @@ class IsPortfolioOwnerOrReadOnly(BasePermission):
 
 
 class IsPortfolioOwnerOrEditorOrReadOnly(BasePermission):
+    message = "Kamu tidak memiliki izin untuk melakukan tindakan ini."
+
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
             return True

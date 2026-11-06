@@ -1887,3 +1887,21 @@ h1, .brand {
 
 
 
+
+.result-count {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 0 0 1rem;
+}
+
+.exp-thumbnail {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: #fff;
+}
+
+#error .btn-secondary-action {
+    margin-top: 1rem;
+}
