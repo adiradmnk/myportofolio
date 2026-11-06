@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm, TextInput, Textarea, URLInput
+from django.forms import DateInput, ModelForm, TextInput, Textarea, URLInput
 from django.utils.html import strip_tags
 from main.models import Experience, Project
 
@@ -90,6 +90,12 @@ class ExperienceForm(ModelForm):
             "thumbnail": URLInput(
                 attrs={
                     "placeholder": "https://...",
+                }
+            ),
+            "ended_at": DateInput(
+                format="%Y-%m-%d",
+                attrs={
+                    "type": "date",
                 }
             ),
         }
