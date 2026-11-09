@@ -64,7 +64,9 @@ Tantangan utamanya adalah mengelola hierarki informasi ketika ukuran layar menyu
 Batasan utama dari static web murni adalah semua informasi harus dihardcode langsung ke dalam file HTML. Ini membuat pembaruan konten (misal menambah proyek baru atau memperbarui bio) menjadi tidak efisien karena harus mengedit kode sumber dan melakukan deployment ulang. Berdasarkan batasan tersebut, fungsionalitas dinamis yang paling ingin saya tambahkan di iterasi selanjutnya adalah arsitektur MVT (Model-View-Template) dengan database. Tujuannya agar saya bisa memisahkan konten (data project, skill) dari struktur tampilan.
 
 ### AI Disclosure
-Walaupun saya mengetik secara menual untuk setiap baris kode, saya tetap menggunakan ai untuk memandu saya dalam proses pembuatan setiap komponen dan cara penyusunan kode yang rapih dan bekerja dengan baik. Disini saya menggunakan ai pertama untuk brainstorming ide bagaimana layout dan isi ide desain dari portofolio yang akan saya buat, setelah konsep dari desian dan isi sudah saya tentukan, maka selanjutnya saya meminta ai untuk menjelaskan kepada saya bertahap bagaimana mewujudkan setiap bagian dari konsep yang sudah saya tentukan sebelumnya, untuk komponen komponen yang ada pada web saya, saya tidak membuatnya dnegan ai tapi saya mengambilnya dari open source library atau dari web open source.
+**Alat AI yang digunakan:** Claude (buatan Anthropic).
+
+Walaupun saya mengetik secara menual untuk setiap baris kode, saya tetap menggunakan Claude untuk memandu saya dalam proses pembuatan setiap komponen dan cara penyusunan kode yang rapih dan bekerja dengan baik. Disini saya menggunakan ai pertama untuk brainstorming ide bagaimana layout dan isi ide desain dari portofolio yang akan saya buat, setelah konsep dari desian dan isi sudah saya tentukan, maka selanjutnya saya meminta Claude untuk menjelaskan kepada saya bertahap bagaimana mewujudkan setiap bagian dari konsep yang sudah saya tentukan sebelumnya, untuk komponen komponen yang ada pada web saya, saya tidak membuatnya dnegan ai tapi saya mengambilnya dari open source library atau dari web open source.
 
 ---
 ## Tugas 2
