@@ -10,7 +10,8 @@ SECRET_KEY = 'django-insecure-9#5^cgd(%mkzf$=)%0!ewc^-7_mwkqd%%wpit8c%rt)4prrzok
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "adriana-ainurrahmah-myportofolio.pws.cs.ui.ac.id"]
+# 10.0.2.2 adalah alamat mesin lokal jika diakses dari emulator Android.
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "10.0.2.2", "adriana-ainurrahmah-myportofolio.pws.cs.ui.ac.id"]
 
 CSRF_TRUSTED_ORIGINS = ["https://adriana-ainurrahmah-myportofolio.pws.cs.ui.ac.id"]
 
@@ -23,11 +24,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'main',
     'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -108,3 +112,24 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 WHITENOISE_USE_FINDERS = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        # TokenAuthentication di urutan pertama agar klien mobile memakai
+        # header "Authorization: Token <key>" dan mendapat 401 jika token
+        # tidak ada/tidak valid. SessionAuthentication tetap dipakai halaman web.
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+}
+
+# CORS untuk Flutter Web (Chrome). Saat pengembangan lokal (PRODUCTION=False)
+# semua origin diizinkan; di production hanya origin pada CORS_ALLOWED_ORIGINS
+# (dipisah koma) yang diizinkan. Aplikasi Android native tidak memakai CORS.
+CORS_ALLOW_ALL_ORIGINS = not PRODUCTION
+if PRODUCTION:
+    CORS_ALLOWED_ORIGINS = [
+        origin.strip()
+        for origin in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
+        if origin.strip()
+    ]
